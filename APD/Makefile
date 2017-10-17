@@ -1,4 +1,5 @@
 exec=lab
+FLAGS=-fopenmp -lm
 
 default: run
 
@@ -7,4 +8,4 @@ run: build
 
 build:
 	clear
-	gcc -fopenmp -o $(exec) $(file)
+	gcc -o $(exec) $(file) $(FLAGS)

@@ -5,7 +5,7 @@
 ******************************************************************************/
 #include<stdio.h>
 #include<stdlib.h>
-// #include<math.h>
+#include<math.h>
 
 #define N 1000
 
@@ -24,7 +24,7 @@ void compareVectors(int * a, int * b) {
 void displayVector(int * v) {
 	// DO NOT MODIFY
 	int i;
-	int displayWidth = 2 + 3;//log10(v[N-1]);
+	int displayWidth = 2 + log10(v[N-1]);
 	for(i = 0; i < N; i++) {
 		printf("%*i", displayWidth, v[i]);
 	}
@@ -61,12 +61,25 @@ int main(int argc, char *argv[]) {
 	// PARALLELIZE ME
 	while(!sorted) {
 		sorted = 1;
-		for(i = 0; i < N-1; i++) {
-			if(v[i] > v[i + 1]) {
-				aux = v[i];
-				v[i] = v[i + 1];
-				v[i + 1] = aux;
-				sorted = 0;
+		#pragma omp parallel private(aux)
+		{
+			#pragma omp for
+			for(i = 0; i < N-1; i++) {
+				if(v[i] > v[i + 1]) {
+					aux = v[i];
+					v[i] = v[i + 1];
+					v[i + 1] = aux;
+					sorted = 0;
+				}
+			}
+			#pragma omp for
+			for (i = 1; i < N-1; i++) {
+				if (v[i] > v[i + 1]) {
+					aux = v[i];
+					v[i] = v[i + 1];
+					v[i + 1] = aux;
+					sorted = 0;
+				}
 			}
 		}
 	}

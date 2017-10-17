@@ -59,8 +59,8 @@ int cmp(const void *a, const void *b) {
 int main(int argc, char *argv[]) {
 	int *v = (int*)malloc(sizeof(int)*N);
 	int *vQSort = (int*)malloc(sizeof(int)*N);
-	int *vNew = (int*)malloc(sizeof(int)*N);
 	int *aux;
+	int *vNew = (int*)malloc(sizeof(int)*N);
 	int i, width;
 
 	// generate the vector v with random values
@@ -78,9 +78,14 @@ int main(int argc, char *argv[]) {
 
 	// sort the vector v
 	// PARALLELIZE ME
+
 	for (width = 1; width < N; width = 2 * width) {
-		for (i = 0; i < N; i = i + 2 * width) {
-			merge(v, i, i+width, i + 2*width, vNew);
+		#pragma omp parallel
+		{
+			#pragma omp for
+			for (i = 0; i < N; i = i + 2 * width) {
+				merge(v, i, i+width, i + 2*width, vNew);
+			}
 		}
 		aux = v;
 		v= vNew;

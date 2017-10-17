@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 	int v[N];
 	int vQSort[N];
 	int i,j;
-
+	int sorted = 0;
 	// generate the vector v with random values
 	// DO NOT MODIFY
 	for(i = 0; i < SQRTN; i++)
@@ -86,7 +86,59 @@ int main(int argc, char *argv[]) {
 
 
 	// sort the matrix m using ShearSort
+	while (!sorted) {
+		sorted = 1;
+		int aux;
+		int sortedRow;
+		int sortedCol;
 
+		#pragma omp parallel private(sortedRow, aux) shared(sorted)
+		{
+			#pragma omp for
+			for (int i = 0; i < SQRTN; i++) {
+				int sgn = 0;
+
+				if (i % 2 == 0) {
+					sgn = -1;
+				} else {
+					sgn = 1;
+				}
+				do {
+					sortedRow = 1;
+					for (int j = 0; j < SQRTN-1; j++) {
+						if (sgn * (m[i][j] - m[i][j+1]) < 0) {
+							aux = m[i][j];
+							m[i][j] = m[i][j+1];
+							m[i][j+1] = aux;
+
+							sortedRow = 0;
+							sorted = 0;
+						}
+					}
+				} while (!sortedRow);
+			}
+		}
+
+		#pragma omp parallel private(sortedCol, aux) shared(sorted)
+		{
+			#pragma omp for
+			for (int i = 0; i < SQRTN; i++) {
+				do {
+					sortedCol = 1;
+					for (int j = 0; j < SQRTN-1; j++) {
+						if (m[j][i] > m[j+1][i]) {
+							aux = m[j][i];
+							m[j][i] = m[j+1][i];
+							m[j+1][i] = aux;
+
+							sortedCol = 0;
+							sorted = 0;
+						}
+					}
+				} while (!sortedCol);
+			}
+		}
+	}
 
 	displayMatrix(m);
 	copyMatrixInVectorSnake(v, m);
