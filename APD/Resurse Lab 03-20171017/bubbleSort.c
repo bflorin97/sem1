@@ -7,7 +7,7 @@
 #include<stdlib.h>
 #include<math.h>
 
-#define N 1000
+#define N 10000
 
 void compareVectors(int * a, int * b) {
 	// DO NOT MODIFY
@@ -64,20 +64,23 @@ int main(int argc, char *argv[]) {
 		#pragma omp parallel private(aux)
 		{
 			#pragma omp for
-			for(i = 0; i < N-1; i++) {
-				if(v[i] > v[i + 1]) {
-					aux = v[i];
-					v[i] = v[i + 1];
-					v[i + 1] = aux;
+			for(i = 0; i < N-1 / 2; i++) {
+				int indexE = 2 * i;
+				if(v[indexE] > v[indexE + 1]) {
+					aux = v[indexE];
+					v[indexE] = v[indexE + 1];
+					v[indexE + 1] = aux;
 					sorted = 0;
 				}
 			}
+
 			#pragma omp for
-			for (i = 1; i < N-1; i++) {
-				if (v[i] > v[i + 1]) {
-					aux = v[i];
-					v[i] = v[i + 1];
-					v[i + 1] = aux;
+			for(i = 1; i < N / 2; i++) {
+				int indexO = 2 * i - 1;
+				if (i + 1 < N && v[indexO] > v[indexO + 1]) {
+					aux = v[indexO];
+					v[indexO] = v[indexO + 1];
+					v[indexO + 1] = aux;
 					sorted = 0;
 				}
 			}

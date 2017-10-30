@@ -80,12 +80,10 @@ int main(int argc, char *argv[]) {
 	// PARALLELIZE ME
 
 	for (width = 1; width < N; width = 2 * width) {
-		#pragma omp parallel
-		{
-			#pragma omp for
-			for (i = 0; i < N; i = i + 2 * width) {
-				merge(v, i, i+width, i + 2*width, vNew);
-			}
+
+		#pragma omp parallel for
+		for (i = 0; i < N; i = i + 2 * width) {
+			merge(v, i, i+width, i + 2*width, vNew);
 		}
 		aux = v;
 		v= vNew;
