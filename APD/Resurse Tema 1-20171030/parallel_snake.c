@@ -28,22 +28,39 @@ void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 	// DO NOT include any I/O stuff here, but make sure that world and snakes
 	// parameters are updated as required for the final state.
 
-	int gameOver = 0;
 	int step, k;
+	int gameOver = 0;
+	int snakeEnd = 0;
+	char lastDirection = ' ';
+	char direction;
+	int i, j;
+
+	int y, x;
+	int di, dj;
+	int d;
+
+	// omp_set_num_threads(4);
 
 	for (step = 0; step < step_count && !gameOver; step++) {
-		for (k = 0; k < num_snakes && !gameOver; k++) {
 
-			int snakeEnd = 0;
-			char lastDirection = ' ';
-			char direction = snakes[k].direction;
+		/* --- check for collisions ---
+			Pot aparea coliziuni intre threaduri deoarece doua thread-uri pot
+			sa modifice si verifice simultan in acelasi loc din matrice.
+		*/
 
-			int i = snakes[k].head.line;
-			int j = snakes[k].head.col;
+		int v = num_snakes;
+		// #pragma omp parallel for num_threads(4)
+		for (k = 0; k < v; k++) {
+			snakeEnd = 0;
+			lastDirection = ' ';
+			direction = snakes[k].direction;
 
-			int y, x;
-			int di, dj;
-			int d;
+			i = snakes[k].head.line;
+			j = snakes[k].head.col;
+
+			direction = snakes[k].direction;
+			i = snakes[k].head.line;
+			j = snakes[k].head.col;
 
 			di = direction == 'N' ? -1 : direction == 'S' ? 1 : 0;
 			dj = direction == 'V' ? -1 : direction == 'E' ? 1 : 0;
@@ -51,10 +68,55 @@ void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 			y = index_in_bounds(i, di, num_lines);
 			x = index_in_bounds(j, dj, num_cols);
 
-			if (world[y][x] != 0) {
-				gameOver = 1;
-				break;
-			}
+			// #pragma omp critical
+			// {
+				if (world[y][x] != 0) {
+					gameOver = 1;
+					// break;
+					v = 0;
+				} else {
+					world[y][x] = -1;
+				}
+			// }
+		}
+
+		// for (int ii = 0; ii < num_lines; ii++) {
+		// 	for (int jj = 0; jj < num_cols; jj++) {
+		// 		printf("%2d ", world[ii][jj]);
+		// 	}
+		// 	printf("\n");
+		// }
+		//
+		// printf("gameOver:[%d]; step:[%d]\n", gameOver, step);
+		// scanf("%c", &direction);
+
+		/*  --- update snakes ---
+		 	Este garantat ca nu exista coliziune cu alt sarpe sau cu el
+			insusi => mai multe thread-uri nu vor incerca sa acceseze
+			aceleasi resurse.
+		*/
+		if (gameOver) {
+			continue;
+		}
+
+		for (int k = 0; k < num_snakes; k++) {
+			snakeEnd = 0;
+			lastDirection = ' ';
+			direction = snakes[k].direction;
+
+			i = snakes[k].head.line;
+			j = snakes[k].head.col;
+
+			direction = snakes[k].direction;
+			i = snakes[k].head.line;
+			j = snakes[k].head.col;
+
+			di = direction == 'N' ? -1 : direction == 'S' ? 1 : 0;
+			dj = direction == 'V' ? -1 : direction == 'E' ? 1 : 0;
+
+			y = index_in_bounds(i, di, num_lines);
+			x = index_in_bounds(j, dj, num_cols);
+
 			snakes[k].head.line = y;
 			snakes[k].head.col = x;
 
@@ -83,7 +145,6 @@ void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 					}
 				}
 
-
 				snakeEnd = d == 4;
 
 				if (snakeEnd) {
@@ -102,13 +163,23 @@ void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 					direction == 'E' ? 'V' :
 					direction == 'V' ? 'E' : ' ';
 			}
-			// for (int ii = 0; ii < num_lines; ii++) {
-			// 	for (int jj = 0; jj < num_cols; jj++) {
-			// 		printf("%d ", world[ii][jj]);
-			// 	}
-			// 	printf("\n");
-			// }
-			// scanf("%c", &direction);
 		}
 	}
+
+	for (i = 0; i < num_lines; i++) {
+		for (j = 0; j < num_lines; j++) {
+			if (world[i][j] == -1) {
+				world[i][j] = 0;
+			}
+		}
+	}
+	// for (int ii = 0; ii < num_lines; ii++) {
+	// 	for (int jj = 0; jj < num_cols; jj++) {
+	// 		printf("%d ", world[ii][jj]);
+	// 	}
+	// 	printf("\n");
+	// }
+	//
+	// printf("gameOver:[%d]; step:[%d]\n", gameOver, step);
+	printf("steps:[%d]\n", step);
 }

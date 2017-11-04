@@ -1,8 +1,7 @@
-.PHONY: clean
 
-input=teste/input2
+input=teste/big_input
 output=output
-runde=400
+runde=30000
 
 run: build
 	./parallel_snake $(input) $(output) $(runde)
@@ -15,3 +14,5 @@ build:
 
 clean:
 	rm -f parallel_snake
+
+.PHONY: clean
