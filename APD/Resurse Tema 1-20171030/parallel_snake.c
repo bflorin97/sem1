@@ -150,8 +150,8 @@ void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 			// {
 			if (world[y][x] != 0) {
 				gameOver = 1;
-				break;
 				v = 0;
+				break;
 			} else {
 				world[y][x] = -1;
 			}
