@@ -1,5 +1,5 @@
 
-input=teste/big_input
+input=teste/input2
 output=output
 runde=30000
 
