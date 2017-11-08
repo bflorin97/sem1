@@ -1,5 +1,6 @@
 #include "main.h"
 #include <stdio.h>
+#include <omp.h>
 
 int index_in_bounds(int x, int dx, int limit) {
 	return x + dx >= limit ? x + dx - limit :
@@ -21,23 +22,9 @@ char itoc(int d) {
 
 void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 	struct snake *snakes, int step_count, char *file_name)
-{
-	// TODO: Implement Parallel Snake simulation using the default (env. OMP_NUM_THREADS)
-	// number of threads.
-	//
-	// DO NOT include any I/O stuff here, but make sure that world and snakes
-	// parameters are updated as required for the final state.
 
 	int step, k;
 	int gameOver = 0;
-	int snakeEnd = 0;
-	char lastDirection = ' ';
-	char direction;
-	int i, j;
-
-	int y, x;
-	int di, dj;
-	int d;
 
 	// omp_set_num_threads(4);
 
@@ -48,128 +35,104 @@ void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 			sa modifice si verifice simultan in acelasi loc din matrice.
 		*/
 
-		int v = num_snakes;
-		// #pragma omp parallel for num_threads(4)
-		for (k = 0; k < v; k++) {
-			snakeEnd = 0;
-			lastDirection = ' ';
-			direction = snakes[k].direction;
 
-			i = snakes[k].head.line;
-			j = snakes[k].head.col;
+		#pragma omp parallel num_threads(4)
+		{
+			int v = num_snakes;
+			#pragma omp for
+			for (k = 0; k < num_snakes; k++) {
+				int snakeEnd = 0;
+				char lastDirection = ' ';
+				char direction = snakes[k].direction;
+				int i = snakes[k].head.line;
+				int j = snakes[k].head.col;
+				int di = direction == 'N' ? -1 : direction == 'S' ? 1 : 0;
+				int dj = direction == 'V' ? -1 : direction == 'E' ? 1 : 0;
+				int y = index_in_bounds(i, di, num_lines);
+				int x = index_in_bounds(j, dj, num_cols);
 
-			direction = snakes[k].direction;
-			i = snakes[k].head.line;
-			j = snakes[k].head.col;
-
-			di = direction == 'N' ? -1 : direction == 'S' ? 1 : 0;
-			dj = direction == 'V' ? -1 : direction == 'E' ? 1 : 0;
-
-			y = index_in_bounds(i, di, num_lines);
-			x = index_in_bounds(j, dj, num_cols);
-
-			// #pragma omp critical
-			// {
-				if (world[y][x] != 0) {
-					gameOver = 1;
-					// break;
-					v = 0;
-				} else {
-					world[y][x] = -1;
+				#pragma omp critical
+				{
+					if (world[y][x] != 0) {
+						num_snakes = -1;
+						printf("snake[%d] from [%d,%d] says that collide with [%d,%d] at [%d]\n",
+							k, i, j, y, x, world[y][x]);
+					} else {
+						world[y][x] = -1;
+					}
 				}
-			// }
-		}
+			}
 
-		// for (int ii = 0; ii < num_lines; ii++) {
-		// 	for (int jj = 0; jj < num_cols; jj++) {
-		// 		printf("%2d ", world[ii][jj]);
-		// 	}
-		// 	printf("\n");
-		// }
-		//
-		// printf("gameOver:[%d]; step:[%d]\n", gameOver, step);
-		// scanf("%c", &direction);
+			#pragma omp for
+			for (int k = 0; k < num_snakes; k++) {
 
-		/*  --- update snakes ---
-		 	Este garantat ca nu exista coliziune cu alt sarpe sau cu el
-			insusi => mai multe thread-uri nu vor incerca sa acceseze
-			aceleasi resurse.
-		*/
-		if (gameOver) {
-			continue;
-		}
+				int snakeEnd = 0;
+				char lastDirection = ' ';
+				char direction = snakes[k].direction;
+				int i = snakes[k].head.line;
+				int j = snakes[k].head.col;
+				int di = direction == 'N' ? -1 : direction == 'S' ? 1 : 0;
+				int dj = direction == 'V' ? -1 : direction == 'E' ? 1 : 0;
+				int y = index_in_bounds(i, di, num_lines);
+				int x = index_in_bounds(j, dj, num_cols);
 
-		for (int k = 0; k < num_snakes; k++) {
-			snakeEnd = 0;
-			lastDirection = ' ';
-			direction = snakes[k].direction;
+				snakes[k].head.line = y;
+				snakes[k].head.col = x;
 
-			i = snakes[k].head.line;
-			j = snakes[k].head.col;
+				world[i][j] = 0;
+				world[y][x] = snakes[k].encoding;
+				lastDirection = direction;
 
-			direction = snakes[k].direction;
-			i = snakes[k].head.line;
-			j = snakes[k].head.col;
+				while (!snakeEnd) {
 
-			di = direction == 'N' ? -1 : direction == 'S' ? 1 : 0;
-			dj = direction == 'V' ? -1 : direction == 'E' ? 1 : 0;
+					int d;
+					di = dj = -1;
+					for (d = 0; d < 4; d++) {
+						direction = itoc(d);
 
-			y = index_in_bounds(i, di, num_lines);
-			x = index_in_bounds(j, dj, num_cols);
+						if (direction == lastDirection) {
+							continue;
+						}
 
-			snakes[k].head.line = y;
-			snakes[k].head.col = x;
+						di = direction == 'N' ? -1 : direction == 'S' ? 1 : 0;
+						dj = direction == 'V' ? -1 : direction == 'E' ? 1 : 0;
 
-			world[i][j] = 0;
-			world[y][x] = snakes[k].encoding;
-			lastDirection = direction;
+						y = index_in_bounds(i, di, num_lines);
+						x = index_in_bounds(j, dj, num_cols);
 
-			while (!snakeEnd) {
-
-				di = dj = -1;
-				for (d = 0; d < 4; d++) {
-					direction = itoc(d);
-
-					if (direction == lastDirection) {
-						continue;
+						if (world[y][x] == snakes[k].encoding) {
+							break;
+						}
 					}
 
-					di = direction == 'N' ? -1 : direction == 'S' ? 1 : 0;
-					dj = direction == 'V' ? -1 : direction == 'E' ? 1 : 0;
+					snakeEnd = d == 4;
 
-					y = index_in_bounds(i, di, num_lines);
-					x = index_in_bounds(j, dj, num_cols);
-
-					if (world[y][x] == snakes[k].encoding) {
+					if (snakeEnd) {
+						world[i][j] = 0;
 						break;
 					}
+
+					world[i][j] = snakes[k].encoding;
+					world[y][x] = 0;
+
+					i = index_in_bounds(i, di, num_lines);
+					j = index_in_bounds(j, dj, num_cols);
+
+					lastDirection = direction == 'N' ? 'S' :
+						direction == 'S' ? 'N' :
+						direction == 'E' ? 'V' :
+						direction == 'V' ? 'E' : ' ';
 				}
-
-				snakeEnd = d == 4;
-
-				if (snakeEnd) {
-					world[i][j] = 0;
-					break;
-				}
-
-				world[i][j] = snakes[k].encoding;
-				world[y][x] = 0;
-
-				i = index_in_bounds(i, di, num_lines);
-				j = index_in_bounds(j, dj, num_cols);
-
-				lastDirection = direction == 'N' ? 'S' :
-					direction == 'S' ? 'N' :
-					direction == 'E' ? 'V' :
-					direction == 'V' ? 'E' : ' ';
 			}
+
 		}
 	}
 
-	for (i = 0; i < num_lines; i++) {
-		for (j = 0; j < num_lines; j++) {
-			if (world[i][j] == -1) {
-				world[i][j] = 0;
+	int ii, jj;
+	for (ii = 0; ii < num_lines; ii++) {
+		for (jj = 0; jj < num_lines; jj++) {
+			if (world[ii][jj] == -1) {
+				world[ii][jj] = 0;
 			}
 		}
 	}
