@@ -1,5 +1,6 @@
 #include "main.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <omp.h>
 
 int index_in_bounds(int x, int dx, int limit) {
@@ -7,7 +8,7 @@ int index_in_bounds(int x, int dx, int limit) {
 	x + dx < 0 ? x + dx + limit : x + dx;
 }
 
-/* decodifica un intreg intr-o directie :
+/* Decode int to direction:
 0 - 'N'
 1 - 'S'
 2 - 'V'
@@ -21,24 +22,18 @@ char itoc(int d) {
 }
 
 void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
-	struct snake *snakes, int step_count, char *file_name)
+	struct snake *snakes, int step_count, char *file_name) {
 
 	int step, k;
-	int gameOver = 0;
+	int num_threads = omp_get_max_threads();
 
-	// omp_set_num_threads(4);
+	for (step = 0; step < step_count; step++) {
 
-	for (step = 0; step < step_count && !gameOver; step++) {
-
-		/* --- check for collisions ---
-			Pot aparea coliziuni intre threaduri deoarece doua thread-uri pot
-			sa modifice si verifice simultan in acelasi loc din matrice.
-		*/
-
-
-		#pragma omp parallel num_threads(4)
+		#pragma omp parallel num_threads(num_threads)
 		{
-			int v = num_snakes;
+			/******************************************************
+			Check collisions for each snake
+			******************************************************/
 			#pragma omp for
 			for (k = 0; k < num_snakes; k++) {
 				int snakeEnd = 0;
@@ -55,16 +50,25 @@ void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 				{
 					if (world[y][x] != 0) {
 						num_snakes = -1;
-						printf("snake[%d] from [%d,%d] says that collide with [%d,%d] at [%d]\n",
-							k, i, j, y, x, world[y][x]);
 					} else {
 						world[y][x] = -1;
 					}
 				}
 			}
 
+			/******************************************************
+			A collision was detected at step k+1 so i shoul stop
+			the algorithm here to save matrix from step k
+			******************************************************/
+			if (num_snakes < 0) {
+				step_count = -1;
+			}
+
+			/******************************************************
+			Update & move snakes acording to direction
+			******************************************************/
 			#pragma omp for
-			for (int k = 0; k < num_snakes; k++) {
+			for (k = 0; k < num_snakes; k++) {
 
 				int snakeEnd = 0;
 				char lastDirection = ' ';
@@ -128,21 +132,17 @@ void run_simulation(int num_lines, int num_cols, int **world, int num_snakes,
 		}
 	}
 
-	int ii, jj;
-	for (ii = 0; ii < num_lines; ii++) {
-		for (jj = 0; jj < num_lines; jj++) {
-			if (world[ii][jj] == -1) {
-				world[ii][jj] = 0;
+	/******************************************************
+	Clean up the matrix (if a collision was detected, then
+	the next position of each snake will be in matrix as -1)
+	******************************************************/
+
+	int i, j;
+	for (i = 0; i < num_lines; i++) {
+		for (j = 0; j < num_lines; j++) {
+			if (world[i][j] == -1) {
+				world[i][j] = 0;
 			}
 		}
 	}
-	// for (int ii = 0; ii < num_lines; ii++) {
-	// 	for (int jj = 0; jj < num_cols; jj++) {
-	// 		printf("%d ", world[ii][jj]);
-	// 	}
-	// 	printf("\n");
-	// }
-	//
-	// printf("gameOver:[%d]; step:[%d]\n", gameOver, step);
-	printf("steps:[%d]\n", step);
 }

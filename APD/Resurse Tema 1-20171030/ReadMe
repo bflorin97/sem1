@@ -1,0 +1,48 @@
+*******************************************************************************
+
+Pentru implementarea temei m-am gandit la o solutie care nu este optima(serial),
+insa se poate observa scalabilitatea in functie de numarul de thread-uri.
+La fiecare pas efectuez doua operatii (echivalente a doua for-uri):
+    1. Verific daca la pasul k+1 exista coliziune punand -1 in matrice pe
+    pozitia viitoare a fiecarui sarpe. Daca un sarpe gaseste pe pozitia
+    viitoare o valoare diferita de 0, atunci se semnaleaza iesirea din for-uri
+    prin setarea valorilor variabilelor num_snakes si step_count cu -1.
+    2. Cunoscand faptul ca nu exista coliziune intre serpi, adica orice valoare
+    modificata nu influenteaza ceilalti serpi(nu se suprapun), deplasez sarpele
+    pe pozitia viitoare, impreuna cu celelalte elemente ale sale.
+
+Pentru implementarea paralela am ales sa paralelizez cele doua for-uri din
+interior.
+
+Timpi de executie serial:
+-----------------------------------------
+#test   |   #threads    |   time
+-----------------------------------------
+0   |       1       |   251.815402733
+1   |       1       |   322.196444894
+2   |       1       |   313.930382618
+-----------------------------------------
+
+
+Timpi de executie paralel:
+-----------------------------------------
+#test   |   #threads    |   time
+-----------------------------------------
+    0   |       2       |   135.529774368
+    1   |       2       |   136.987095521
+    2   |       2       |   135.412237798
+-----------------------------------------
+    3   |       4       |   75.946910935
+    4   |       4       |   73.818568100
+    5   |       4       |   75.291661340
+-----------------------------------------
+    6   |       6       |   56.512248006
+    7   |       6       |   54.640907194
+    8   |       6       |   55.370173074
+-----------------------------------------
+    9   |       8       |   47.353249563
+    10  |       8       |   44.520860770
+    11  |       8       |   43.861037592
+-----------------------------------------
+
+*******************************************************************************
