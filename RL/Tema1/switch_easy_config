@@ -1,0 +1,68 @@
+
+-------------------------------- SWITCH --------------------------
+enable
+configure terminal
+
+----------------------------------GSW1----------------------------------
+int fa0/24
+switchport mode trunk
+switchport trunk native vlan 120
+exit
+int fa0/23
+switchport mode trunk
+switchport trunk native vlan 140
+exit
+
+----------------------------------GSW2----------------------------------
+int fa0/1
+switchport mode access
+switchport access vlan 120
+exit
+int fa0/2
+switchport mode access
+switchport access vlan 140
+exit
+int fa0/24
+switchport mode trunk
+switchport trunk native vlan 120
+exit
+
+----------------------------------GSW3----------------------------------
+int fa0/1
+switchport mode access
+switchport access vlan 120
+exit
+int fa0/2
+switchport mode access
+switchport access vlan 140
+exit
+int fa0/23
+switchport mode trunk
+switchport trunk native vlan 140
+exit
+
+----------------------------------BSW1----------------------------------
+int fa0/3
+switchport mode access
+switchport access vlan 195
+exit
+
+----------------------------------BSW2----------------------------------
+int fa0/2
+switchport mode access
+switchport access vlan 99
+exit
+int fa0/1
+switchport mode access
+switchport access vlan 99
+exit
+
+----------------------------------BSW3----------------------------------
+
+----------------------------------BSW4----------------------------------
+
+int fa0/1
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 51,26
+exit
