@@ -1,33 +1,79 @@
 -------------------------------- ROUTER --------------------------
+
+----------------------------------GR1----------------------------------
 enable
 configure terminal
-
-int fa0/1.602
-no shut
-encapsulation dot1q 602
-ip address 54.60.6.99 255.255.255.248
-exit
-
-int fa0/1.936
-no shut
-encapsulation dot1q 936
-ip address 54.60.6.105 255.255.255.252
-exit
-
 int fa0/0
+no shut
+exit
+int fa0/0.120
+no shut
+encapsulation dot1q 120
+ip address 54.60.5.1 255.255.255.128
+exit
+int fa0/0.140
+no shut
+encapsulation dot1q 140
+ip address 54.60.4.1 255.255.255.0
+exit
+
+----------------------------------BR1----------------------------------
+enable
+configure terminal
+int fa0/0
+no shut
+exit
+int fa0/0.99
+no shut
+encapsulation dot1q 99
+ip address 54.60.5.129 255.255.255.128
+exit
+int fa0/0.201
+no shut
+encapsulation dot1q 201
+ip address 54.60.1.1 255.255.255.0
+exit
+int fa0/0.195
 no shut
 encapsulation dot1q 195
 ip address 54.60.2.1 255.255.255.0
 exit
 
---------------------------------------------------------------------
+----------------------------------PR1----------------------------------
 enable
 configure terminal
+int fa0/0
+no shut
+ip address 54.60.6.1 255.255.255.192
+exit
+int fa0/1
+no shut
+ip address 54.60.6.65 255.255.255.224
+exit
 
+----------------------------------YR1----------------------------------
+enable
+configure terminal
 int fa0/0
 no shut
 ip address 54.60.3.1 255.255.255.0
 exit
+
+----------------------------------YR2----------------------------------
+enable
+configure terminal
+int fa0/0
+no shut
+ip address 54.60.0.1 255.255.255.0
+exit
+
+
+
+
+
+
+
+
 
 --------------------------------------------------------------------
 5)
