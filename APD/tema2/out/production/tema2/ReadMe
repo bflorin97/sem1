@@ -1,0 +1,8 @@
+
+Pentru implementarea temei am creat clasa Database care implementeaza
+functiile de select, insert, update, etc.. din MyDataBase. 
+Functia insert calculeaza, in functie de numarul de thread-uri, 
+liniile dintr-o tabela care satisfac o anumita conditie si aplica
+functiile min, max, count, etc.. unde este cazul. Functia select 
+creeaza mai multe task-uri (Select) pentru fiecare linie din 
+tabela pentru a mari viteza de executie.

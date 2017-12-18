@@ -6,16 +6,19 @@ enable
 configure terminal
 int fa0/24
 switchport mode trunk
-switchport trunk native vlan 120
+switchport trunk native vlan 140
 exit
 int fa0/23
 switchport mode trunk
-switchport trunk native vlan 140
+switchport trunk native vlan 120
 exit
 int gig0/1
 switchport mode trunk
 switchport trunk allowed vlan 120,140
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------GSW2----------------------------------
 enable
@@ -32,6 +35,10 @@ int fa0/24
 switchport mode trunk
 switchport trunk native vlan 120
 exit
+exit
+copy running-config startup-config
+
+
 
 ----------------------------------GSW3----------------------------------
 enable
@@ -48,6 +55,9 @@ int fa0/23
 switchport mode trunk
 switchport trunk native vlan 140
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------BSW1----------------------------------
 enable
@@ -66,6 +76,9 @@ no shutdown
 switchport mode trunk
 switchport trunk allowed vlan 195,99,201
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------BSW2----------------------------------
 enable
@@ -88,6 +101,9 @@ no shutdown
 switchport mode trunk
 switchport trunk allowed vlan 195,99,201
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------BSW3----------------------------------
 enable
@@ -110,6 +126,9 @@ no shutdown
 switchport mode trunk
 switchport trunk allowed vlan 195,99,201
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------BSW4----------------------------------
 enable
@@ -129,6 +148,9 @@ no shutdown
 switchport mode trunk
 switchport trunk allowed vlan 195,99,201
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------PSW1----------------------------------
 enable
@@ -148,6 +170,9 @@ no shutdown
 switchport mode access
 switchport access vlan 51
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------PSW2----------------------------------
 enable
@@ -175,6 +200,9 @@ no shutdown
 switchport mode access
 switchport access vlan 26
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------PSW4----------------------------------
 enable
@@ -197,6 +225,9 @@ no shutdown
 switchport mode trunk
 switchport trunk allowed vlan 51,26
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------YSW1----------------------------------
 enable
@@ -223,6 +254,9 @@ int fa0/1
 switchport mode access
 switchport access vlan 209
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------YSW2----------------------------------
 enable
@@ -249,8 +283,11 @@ int fa0/1
 switchport mode access
 switchport access vlan 165
 exit
+exit
+copy running-config startup-config
 
-----------------------------------YSW2----------------------------------
+
+----------------------------------XSW1----------------------------------
 enable
 configure terminal
 int fa0/4
@@ -274,6 +311,9 @@ no shutdown
 switchport mode trunk
 switchport trunk allowed vlan 502,836
 exit
+exit
+copy running-config startup-config
+
 
 
 
