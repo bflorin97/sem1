@@ -1,0 +1,12 @@
+<project>
+	<target name="compile">
+		<javac srcdir="."/>
+	</target>
+	<target name="jar">
+		<jar destfile="database.jar" basedir=".">
+			<manifest>
+				<attribute name="Main-Class" value="Main"/>
+			</manifest>
+		</jar>
+	</target>
+</project>

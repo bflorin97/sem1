@@ -1,19 +1,28 @@
 
 -------------------------------- SWITCH --------------------------
-enable
-configure terminal
 
 ----------------------------------GSW1----------------------------------
+enable
+configure terminal
 int fa0/24
-switchport mode trunk
-switchport trunk native vlan 120
-exit
-int fa0/23
 switchport mode trunk
 switchport trunk native vlan 140
 exit
+int fa0/23
+switchport mode trunk
+switchport trunk native vlan 120
+exit
+int gig0/1
+switchport mode trunk
+switchport trunk allowed vlan 120,140
+exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------GSW2----------------------------------
+enable
+configure terminal
 int fa0/1
 switchport mode access
 switchport access vlan 120
@@ -26,8 +35,14 @@ int fa0/24
 switchport mode trunk
 switchport trunk native vlan 120
 exit
+exit
+copy running-config startup-config
+
+
 
 ----------------------------------GSW3----------------------------------
+enable
+configure terminal
 int fa0/1
 switchport mode access
 switchport access vlan 120
@@ -40,29 +55,294 @@ int fa0/23
 switchport mode trunk
 switchport trunk native vlan 140
 exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------BSW1----------------------------------
+enable
+configure terminal
 int fa0/3
 switchport mode access
 switchport access vlan 195
 exit
+int fa0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
+exit
+int fa0/1
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
+exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------BSW2----------------------------------
+enable
+configure terminal
+int fa0/1
+switchport mode access
+switchport access vlan 99
+exit
 int fa0/2
 switchport mode access
 switchport access vlan 99
 exit
-int fa0/1
-switchport mode access
-switchport access vlan 99
+int fa0/3
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
 exit
+int gig0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
+exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------BSW3----------------------------------
+enable
+configure terminal
+int fa0/1
+switchport mode access
+switchport access vlan 201
+exit
+int fa0/2
+switchport mode access
+switchport access vlan 201
+exit
+int gig0/1
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
+exit
+int gig0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
+exit
+exit
+copy running-config startup-config
+
 
 ----------------------------------BSW4----------------------------------
+enable
+configure terminal
+int fa0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
+exit
+int gig0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
+exit
+int fa0/24
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 195,99,201
+exit
+exit
+copy running-config startup-config
 
-int fa0/1
+
+----------------------------------PSW1----------------------------------
+enable
+configure terminal
+int gig0/1
 no shutdown
 switchport mode trunk
 switchport trunk allowed vlan 51,26
 exit
+int gig0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 51,26
+exit
+int fa0/1
+no shutdown
+switchport mode access
+switchport access vlan 51
+exit
+exit
+copy running-config startup-config
+
+
+----------------------------------PSW2----------------------------------
+enable
+configure terminal
+int fa0/24
+switchport mode access
+switchport access vlan 26
+exit
+int fa0/23
+switchport mode access
+switchport access vlan 51
+exit
+int gig0/1
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 51,26
+exit
+int gig0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 51,26
+exit
+int fa0/1
+no shutdown
+switchport mode access
+switchport access vlan 26
+exit
+exit
+copy running-config startup-config
+
+
+----------------------------------PSW4----------------------------------
+enable
+configure terminal
+int fa0/1
+switchport mode access
+switchport access vlan 26
+exit
+int fa0/2
+switchport mode access
+switchport access vlan 51
+exit
+int gig0/1
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 51,26
+exit
+int gig0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 51,26
+exit
+exit
+copy running-config startup-config
+
+
+----------------------------------YSW1----------------------------------
+enable
+configure terminal
+int fa0/24
+switchport mode access
+switchport access vlan 209
+exit
+int fa0/23
+switchport mode access
+switchport access vlan 165
+exit
+int gig0/1
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 209,165
+exit
+int gig0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 209,165
+exit
+int fa0/1
+switchport mode access
+switchport access vlan 209
+exit
+exit
+copy running-config startup-config
+
+
+----------------------------------YSW2----------------------------------
+enable
+configure terminal
+int fa0/24
+switchport mode access
+switchport access vlan 209
+exit
+int fa0/23
+switchport mode access
+switchport access vlan 165
+exit
+int gig0/1
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 209,165
+exit
+int gig0/2
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 209,165
+exit
+int fa0/1
+switchport mode access
+switchport access vlan 165
+exit
+exit
+copy running-config startup-config
+
+
+----------------------------------XSW1----------------------------------
+enable
+configure terminal
+int fa0/4
+switchport mode access
+switchport access vlan 502
+exit
+int fa0/6
+switchport mode access
+switchport access vlan 502
+exit
+int fa0/5
+switchport mode access
+switchport access vlan 502
+exit
+int fa0/3
+switchport mode access
+switchport access vlan 836
+exit
+int fa0/1
+no shutdown
+switchport mode trunk
+switchport trunk allowed vlan 502,836
+exit
+exit
+copy running-config startup-config
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------END----------------------------------

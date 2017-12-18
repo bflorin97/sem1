@@ -1,0 +1,24 @@
+
+Pentru implementarea temei am creat clasa Database care implementeaza
+functiile de select, insert, update, etc.. din MyDataBase. 
+
+Functia select calculeaza, in functie de numarul de thread-uri, 
+liniile dintr-o tabela care satisfac o anumita conditie si aplica
+functiile min, max, count, etc.. unde este cazul. Functia select 
+creeaza mai multe task-uri (Select) pentru a analiza fiecare linie 
+din tabela pentru a micsora viteza de executie.
+
+Functia update se bazeaza pe functia de select pentru a selecta
+acele linii care contin informatia ce trebuie modificata, iar 
+modificarea se face atomic.
+
+Functia insert adauga o linie la sfarsitul tabelului cu informatiile
+date ca parametru.
+
+Pentru scalabilitatea programului am impartit liniile din tabel
+pentru a fi prelucrate de cate un thread executand astfel mai multe
+operatii 'simultan'.
+
+Am rezolvat problema cititori-scriitori folosind o implementare 
+minimala.
+
